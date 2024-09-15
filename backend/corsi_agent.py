@@ -1,9 +1,9 @@
 from uagents import Agent, Context, Model
 from uagents.setup import fund_agent_if_low
-from uagents.dispatch import run_agents
+import asyncio
 from aiohttp import web
 import json
-import asyncio
+import os
 
 class CorsiTestData(Model):
     iteration: int
@@ -22,11 +22,18 @@ class AnalysisResponse(Model):
 corsi_agent = Agent(name="corsi_agent", seed="corsi_seed")
 fund_agent_if_low(corsi_agent.wallet.address())
 
+# Ensure the JSON file exists
+if not os.path.exists('corsi_data.json'):
+    with open('corsi_data.json', 'w') as f:
+        json.dump([], f)
+
 # Function to save data to JSON file
 def save_to_json(data):
-    with open('corsi_data.json', 'a') as f:
-        json.dump(data, f)
-        f.write('\n')
+    with open('corsi_data.json', 'r+') as f:
+        file_data = json.load(f)
+        file_data.append(data)
+        f.seek(0)
+        json.dump(file_data, f, indent=2)
 
 @corsi_agent.on_message(CorsiTestData)
 async def handle_corsi_data(ctx: Context, sender: str, msg: CorsiTestData):
@@ -35,18 +42,15 @@ async def handle_corsi_data(ctx: Context, sender: str, msg: CorsiTestData):
 
 @corsi_agent.on_message(AnalysisRequest)
 async def handle_analysis_request(ctx: Context, sender: str, msg: AnalysisRequest):
-    # Read data from JSON file
     with open('corsi_data.json', 'r') as f:
-        data = [json.loads(line) for line in f]
+        data = json.load(f)
     
-    # Generate prompt for analysis
     prompt = f"Analyze the following Corsi Block Test data:\n\n"
     for item in data:
         prompt += f"Iteration: {item['iteration']}, Correct: {item['correct']}\n"
     prompt += "\nProvide insights on the participant's performance and any patterns observed."
     
-    # In a real scenario, you would send this prompt to a language model
-    # For now, we'll just return a placeholder analysis
+    # Placeholder analysis
     analysis = "Based on the Corsi Block Test data, the participant showed improvement over time..."
     
     await ctx.send(sender, AnalysisResponse(analysis=analysis))
@@ -77,4 +81,4 @@ async def run_server():
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.create_task(run_server())
-    run_agents([corsi_agent])
+    loop.run_forever()
