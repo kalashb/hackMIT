@@ -18,8 +18,8 @@
 /* Square in the center */
 .square {
   position: relative;
-  width: 400px;
-  height: 400px;
+  width: 800px;
+  height: 800px;
   background-color: black; /* Black background for interactive area */
   border: 2px solid white;
   display: flex;
@@ -30,8 +30,8 @@
 /* Small grey box with absolute positioning */
 .white-box {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   background-color: lightskyblue;
   transition: background-color 0.5s ease;
 }
@@ -59,4 +59,24 @@
 .retry-button:hover,
 .end-button:hover {
   background-color: lightskyblue;
+}
+
+.end-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.end-message {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.restart-button {
+  font-size: 18px;
+  padding: 10px 20px;
+  cursor: pointer;
 }
