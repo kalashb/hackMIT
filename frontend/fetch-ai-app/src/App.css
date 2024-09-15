@@ -32,7 +32,7 @@
   position: absolute;
   width: 40px;
   height: 40px;
-  background-color: lightskyblue;
+  background-color: rgb(19, 128, 132);
   transition: background-color 0.5s ease;
 }
 

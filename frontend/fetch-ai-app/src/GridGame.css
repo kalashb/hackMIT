@@ -19,7 +19,7 @@
   .grid-square {
     width: 100px;
     height: 100px;
-    background-color: lightskyblue; /* Default color */
+    background-color: rgb(19, 128, 132); /* Default color */
     border: 2px solid white;
     transition: background-color 0.3s ease;
   }
@@ -42,7 +42,7 @@
   }
   
   .grid-game button:hover {
-    background-color: lightskyblue;
+    background-color: rgb(11, 75, 78);
   }
   
   .grid-game button:disabled {

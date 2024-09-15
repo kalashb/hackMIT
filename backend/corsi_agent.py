@@ -1,4 +1,5 @@
 from uagents import Agent, Context, Model
+from typing import List
 from uagents.setup import fund_agent_if_low
 import asyncio
 from aiohttp import web
@@ -7,10 +8,9 @@ import os
 
 class CorsiTestData(Model):
     iteration: int
-    block_positions: list
-    flash_order: list
-    player_order: list
-    correct: bool
+    playerOrder: List[int] | None
+    flashOrder: List[int]
+    reactionTime: int
 
 class AnalysisRequest(Model):
     pass
@@ -18,10 +18,21 @@ class AnalysisRequest(Model):
 class AnalysisResponse(Model):
     analysis: str
 
-# Create an agent
-corsi_agent = Agent(name="corsi_agent", seed="corsi_seed")
-fund_agent_if_low(corsi_agent.wallet.address())
+class Response(Model):
+    text: str
 
+# Create an agent
+corsi_agent = Agent(name="corsi agent asdsa", port=8000, seed="corsi seed asdada", endpoint=["http://localhost:8000/submit"])
+#fund_agent_if_low(corsi_agent.wallet.address())
+
+@corsi_agent.on_query(model=CorsiTestData, replies={Response})
+async def query_handler(ctx: Context, sender: str, _query: CorsiTestData):
+    ctx.logger.info("Query analysed")
+    try:
+        await ctx.send(sender, Response(text="Right hemisphere regions of the inferior prefrontal cortex, anterior occipital cortex, and posterior parietal cortex"))
+    except Exception:
+        await ctx.send(sender, Response(text="fail"))
+'''
 # Ensure the JSON file exists
 if not os.path.exists('corsi_data.json'):
     with open('corsi_data.json', 'w') as f:
@@ -55,6 +66,14 @@ async def handle_analysis_request(ctx: Context, sender: str, msg: AnalysisReques
     
     await ctx.send(sender, AnalysisResponse(analysis=analysis))
 
+@corsi_agent.on_query(model=CorsiTestData, replies={Response})
+async def query_handler(ctx: Context, sender: str, _query: CorsiTestData):
+    ctx.logger.info("Query analysed")
+    try:
+        await ctx.send(sender, Response(text="Right hemisphere regions of the inferior prefrontal cortex, anterior occipital cortex, and posterior parietal cortex"))
+    except Exception:
+        await ctx.send(sender, Response(text="fail"))
+
 # Set up web server
 app = web.Application()
 
@@ -78,7 +97,7 @@ async def run_server():
     await site.start()
     print(f"Server started at http://localhost:8000")
 
+'''
+
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.create_task(run_server())
-    loop.run_forever()
+    corsi_agent.run()

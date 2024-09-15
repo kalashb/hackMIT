@@ -2,9 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 import GridGame from './GridGame.js';
 
-
-
-
 const App = () => {
   const [gameState, setGameState] = useState('welcome');
   const [started, setStarted] = useState(false);
@@ -16,6 +13,9 @@ const App = () => {
   const [retryAvailable, setRetryAvailable] = useState(false);
   const [retryAttempted, setRetryAttempted] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
+  const [clickTime, setClickTime] = useState(null);
+  const [flashTime, setFlashTime] = useState(null);
+  const [data, getData] = useState(null);
 
   const blockRefs = useRef([]);
 
@@ -78,6 +78,7 @@ const App = () => {
       setTimeout(() => {
         const block = blockRefs.current[blockIndex]?.current;
         if (block) {
+          setFlashTime(new Date().getTime());
           block.classList.add('flashed');
           setTimeout(() => {
             block.classList.remove('flashed');
@@ -96,9 +97,13 @@ const App = () => {
     const block = blockRefs.current[index]?.current;
     if (block) {
       block.classList.add('flashed');
+      setClickTime(new Date().getTime());
       setTimeout(() => {
         block.classList.remove('flashed');
       }, 300);
+      getData(flashTime - clickTime);
+      console.log("data====>");
+      console.log(data);
     }
 
     const newPlayerOrder = [...playerOrder, index];
@@ -109,10 +114,62 @@ const App = () => {
         setRetryAttempted(true);
       } else {
         setGameEnded(true);
+        console.log(JSON.stringify({
+          iteration: iteration,
+          playerOrder: newPlayerOrder,
+          flashOrder: flashOrder,
+          reactionTime: flashTime - clickTime,
+        }));
+        fetch('http://127.0.0.1:8001/reaction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            iteration: iteration,
+            playerOrder: newPlayerOrder,
+            flashOrder: flashOrder,
+            reactionTime: flashTime - clickTime,
+            // Add any other relevant data you want to send
+          }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
       }
     } else if (newPlayerOrder.length === flashOrder.length) {
       if (retryAttempted) {
         setGameEnded(true);
+        console.log(JSON.stringify({
+          iteration: iteration,
+          playerOrder: newPlayerOrder,
+          flashOrder: flashOrder,
+          reactionTime: flashTime - clickTime,
+        }));
+        fetch('http://127.0.0.1:8001/reaction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            iteration: iteration,
+            playerOrder: newPlayerOrder,
+            flashOrder: flashOrder,
+            reactionTime: flashTime - clickTime,
+            // Add any other relevant data you want to send
+          }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
       } else {
         setTimeout(() => handleNext(), 500);
       }
@@ -152,6 +209,8 @@ const App = () => {
   const handleRetryEntireGame = () => {
     handleRestart();
   };
+
+
 
   return (
     <div className="container">
