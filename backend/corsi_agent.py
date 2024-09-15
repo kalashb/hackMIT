@@ -32,6 +32,8 @@ async def query_handler(ctx: Context, sender: str, _query: CorsiTestData):
         await ctx.send(sender, Response(text="Right hemisphere regions of the inferior prefrontal cortex, anterior occipital cortex, and posterior parietal cortex"))
     except Exception:
         await ctx.send(sender, Response(text="fail"))
+
+
 '''
 # Ensure the JSON file exists
 if not os.path.exists('corsi_data.json'):

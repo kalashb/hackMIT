@@ -23,18 +23,18 @@ const App = () => {
     const isOverlapping = (pos, positions) => {
       return positions.some((existingPos) => {
         return (
-          pos.left < existingPos.left + 20 &&
-          pos.left + 20 > existingPos.left &&
-          pos.top < existingPos.top + 20 &&
-          pos.top + 20 > existingPos.top
+          pos.left < existingPos.left + 40 &&
+          pos.left + 40 > existingPos.left &&
+          pos.top < existingPos.top + 40 &&
+          pos.top + 40 > existingPos.top
         );
       });
     };
 
     let positions = [];
     while (positions.length < num) {
-      const randomX = Math.floor(Math.random() * (400 - 20));
-      const randomY = Math.floor(Math.random() * (400 - 20));
+      const randomX = Math.floor(Math.random() * (800 - 40));
+      const randomY = Math.floor(Math.random() * (800 - 40));
       const newPosition = { top: randomY, left: randomX };
 
       if (!isOverlapping(newPosition, positions)) {
@@ -60,6 +60,7 @@ const App = () => {
   };
 
   const startIteration = (level) => {
+
     const newPositions = generateBlockPositions(level);
     const newFlashOrder = generateFlashOrder(level);
     setBlockPositions(newPositions);
@@ -69,6 +70,7 @@ const App = () => {
     setRetryAttempted(false);
     setGameEnded(false);
     blockRefs.current = new Array(level).fill(null).map(() => React.createRef());
+
     flashBlocks(newFlashOrder);
   };
 
@@ -171,7 +173,7 @@ const App = () => {
             console.error('Error:', error);
           });
       } else {
-        setTimeout(() => handleNext(), 500);
+        setTimeout(() => handleNext(), 1000);
       }
     }
   };
@@ -232,6 +234,7 @@ const App = () => {
                 Game Over! <br />
                 You completed {iteration - 1} iteration(s).
               </div>
+              <div className="output"><p>Good attempt. Areas to work on: right hemisphere regions of the inferior prefrontal cortex, anterior occipital cortex, and posterior parietal cortex</p></div>
               <button className="restart-button" onClick={handleNextMinigame}>
                 Next Minigame
               </button>

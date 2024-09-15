@@ -1,38 +1,48 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './GridGame.css'; // Import your custom styles
 
-export const GridGame = ({ onGameOver, onRetry }) => {
-    const [activeSquare, setActiveSquare] = useState(null);
-    const [previousSquare, setPreviousSquare] = useState(null);
+export const GridGame = ({ onGameOver }) => {
     const [waitingForInput, setWaitingForInput] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [message, setMessage] = useState('');
+    const currentSquareRef = useRef(null);
+    const previousSquareRef = useRef(null);
     const timeoutRef = useRef(null);
     const intervalRef = useRef(null);
 
-    const generateRandomSquare = () => Math.floor(Math.random() * 9);
+    const generateRandomSquare = () => Math.floor(Math.random() * 4);
 
     // Start flashing a new square every 2 seconds
     const startFlashing = () => {
         intervalRef.current = setInterval(() => {
             if (gameOver) return;
 
-            setActiveSquare(null); // Temporarily turn off the active square
-            setTimeout(() => {
-                const newSquare = generateRandomSquare();
-                setPreviousSquare(activeSquare);
-                setActiveSquare(newSquare);
+            // Flash a new square every 2 seconds
+            const previousSquare = currentSquareRef.current;
+            const newSquare = generateRandomSquare();
 
-                // Start the 2-second countdown for the player to react
-                setWaitingForInput(true);
-                timeoutRef.current = setTimeout(() => {
-                    if (!gameOver && waitingForInput) {
-                        setGameOver(true);
-                        setMessage('You did not click match.');
-                        onGameOver();
-                    }
-                }, 2000);
-            }, 200); // Black flash duration (0.2 seconds)
+            // Set the new square and update refs
+            previousSquareRef.current = previousSquare;
+            currentSquareRef.current = newSquare;
+
+            // Trigger a flash effect by adding a CSS class
+            document.querySelectorAll('.grid-square').forEach((element, index) => {
+                element.classList.remove('flash'); // Remove flash class
+                if (index === newSquare) {
+                    element.classList.add('flash'); // Add flash class to the current square
+                }
+            });
+
+            // Start the 2-second countdown for player response
+            setWaitingForInput(true);
+            timeoutRef.current = setTimeout(() => {
+                if (waitingForInput) {
+                    setMessage(`You did not click match. Last Square: ${previousSquare}, Current Square: ${newSquare}`);
+                    setGameOver(true);
+                    onGameOver();
+                }
+            }, 2000); // 2 seconds to respond
+
         }, 2000); // Flash a new square every 2 seconds
     };
 
@@ -44,19 +54,17 @@ export const GridGame = ({ onGameOver, onRetry }) => {
         };
     }, [gameOver]);
 
-    // Handle the match button click
     const handleMatch = () => {
         if (!waitingForInput || gameOver) return;
 
         setWaitingForInput(false); // Stop waiting for input
 
-        if (activeSquare === previousSquare) {
+        if (currentSquareRef.current === previousSquareRef.current) {
             // Correct match, continue flashing new squares
-            setActiveSquare(null); // Turn off the active square to reset
         } else {
             // Incorrect match
+            setMessage(`That was not a match. Last Square: ${previousSquareRef.current}, Current Square: ${currentSquareRef.current}`);
             setGameOver(true);
-            setMessage('That was not a match.');
             onGameOver();
         }
     };
@@ -64,10 +72,10 @@ export const GridGame = ({ onGameOver, onRetry }) => {
     return (
         <div className="grid-game">
             <div className="grid-container">
-                {[...Array(9)].map((_, index) => (
+                {[...Array(4)].map((_, index) => (
                     <div
                         key={index}
-                        className={`grid-square ${activeSquare === index ? 'active' : ''}`}
+                        className={`grid-square ${currentSquareRef.current === index ? 'active' : ''}`}
                     />
                 ))}
             </div>
@@ -76,16 +84,11 @@ export const GridGame = ({ onGameOver, onRetry }) => {
             )}
             {gameOver && (
                 <div>
-                    <p>{message}</p>
-                    <button onClick={onRetry}>Retry the Entire Game</button>
+                    <p className="error-message">{message}</p> {/* Apply custom CSS class */}
                 </div>
             )}
         </div>
     );
 };
-
-
-
-
 
 export default GridGame;
