@@ -1,0 +1,54 @@
+# Python related
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+venv/
+env/
+*.env
+*.sqlite3
+*.log
+
+# Flask specific
+instance/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Fetch.ai specific
+*.fetchai/
+
+# React related
+node_modules/
+build/
+*.log
+*.env
+
+# System specific
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.vscode/
+.idea/
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+
+# Test coverage reports
+.coverage
+*.coverage
+*.cover
+nosetests.xml
+coverage.xml
+*.coveragerc
+*.tox/
+*.nox/
+*.hypothesis/
+*.pytest_cache/
+*.mypy_cache/
+*.dmypy.json
+*.pylint.d/
