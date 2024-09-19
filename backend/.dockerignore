@@ -20,6 +20,12 @@
 **/*.*proj.user
 **/*.dbmdl
 **/*.jfm
+node_modules
+dist
+.git
+Dockerfile
+.dockerignore
+.env
 **/bin
 **/charts
 **/docker-compose*
