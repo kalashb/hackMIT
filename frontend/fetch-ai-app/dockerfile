@@ -8,6 +8,7 @@
 
 ARG PYTHON_VERSION=3.12.6
 FROM python:${PYTHON_VERSION}-slim as base
+FROM ghcr.io/railwayapp/nixpacks:ubuntu-1725321821
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -43,9 +44,19 @@ USER appuser
 
 # Copy the source code into the container.
 COPY . .
+COPY . /app
+
+COPY .nixpacks/nixpkgs-e05605ec414618eab4a7a6aea8b38f6fbbcc8f08.nix .nixpacks/nixpkgs-e05605ec414618eab4a7a6aea8b38f6fbbcc8f08.nix
+RUN nix-env -if .nixpacks/nixpkgs-e05605ec414618eab4a7a6aea8b38f6fbbcc8f08.nix && nix-collect-garbage -d
+
+
+RUN npm ci
+RUN npm run build
+
 
 # Expose the port that the application listens on.
 EXPOSE 8000
 
 # Run the application.
 CMD https://ccckp9dq-8000.use.devtunnels.ms/
+CMD ["npm", "run", "start"]
